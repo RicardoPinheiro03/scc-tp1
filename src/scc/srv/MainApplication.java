@@ -12,6 +12,8 @@ public class MainApplication extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> set = new HashSet<>();
         set.add( MediaResource.class );
+        set.add( PostResource.class );
+        set.add( UserResource.class );
         return set;
     }
 }

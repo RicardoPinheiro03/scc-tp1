@@ -2,25 +2,32 @@ package scc.srv;
 
 //import sun.plugin2.message.Message;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import com.microsoft.azure.storage.CloudStorageAccount;
+import com.microsoft.azure.storage.StorageException;
+import com.microsoft.azure.storage.blob.CloudBlob;
+import com.microsoft.azure.storage.blob.CloudBlobClient;
+import com.microsoft.azure.storage.blob.CloudBlobContainer;
+
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.HashMap;
 
 @Path("/media")
 public class MediaResource {
 
-    public static int NO_OF_IMAGES = 10000;
-    private HashMap<String, byte[]> images = new HashMap<>(NO_OF_IMAGES);
-    private String nameOfImage;
+    //public static int NO_OF_IMAGES = 10000;
+    //private HashMap<String, byte[]> images = new HashMap<>(NO_OF_IMAGES);
+    //private String nameOfImage;
 
 	//TODO: Method to be removed
     /*@GET
@@ -29,25 +36,76 @@ public class MediaResource {
         return "Hello world !!! -- TO BE REMOVED";
     }*/
 
+    public CloudBlobContainer getContainer() {
+        String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=scc41631;AccountKey=OsaUANGQMKhi3hHoywsV40M6SyVSzCcZUISzq23XF/3pqt9HEBqfhUd29ONdjVTqA51uOMZ6xMToAVv4VZPegw==;EndpointSuffix=core.windows.net";
+        CloudStorageAccount storageAccount = null;
+        CloudBlobContainer container = null;
+        try {
+            storageAccount = CloudStorageAccount.parse(storageConnectionString);
+            CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
+            container = blobClient.getContainerReference("images");
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (StorageException e) {
+            e.printStackTrace();
+        }
+
+        // TODO: WebApplication Exception
+        return container;
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/test")
-    public String upload(byte[] contents) throws NoSuchAlgorithmException {
-        /*// TODO the InputStream is missing!
+    public Response upload(byte[] contents) throws URISyntaxException, InvalidKeyException, StorageException, IOException, NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(contents);
-        byte[] digest = md.digest(); // get the hash of the contents for the UID (Unique Identifier)
-        images.put(digest.toString(), contents);
-        nameOfImage = digest.toString();
-        return nameOfImage;*/
+        //md.update(contents);
+        byte[] digest = md.digest(contents); // get the hash of the contents for the UID (Unique Identifier)
+        String nameOfImage = Base64.getEncoder().encodeToString(digest); // Convert the byte array to String
 
-        return "hey ya";
+        CloudBlobContainer myContainer = getContainer();
+
+        // Get reference to blob
+        CloudBlob blob = myContainer.getBlockBlobReference(nameOfImage);
+
+        /* if(myContainer.getBlobReferenceFromServer(nameOfImage).exists()) {
+            return Response
+                    .status(Response.Status.CONFLICT)
+                    .entity(nameOfImage)
+                    .build(); // If the blob content already exists, reply with a conflict exception
+        }
+        This breaks the deploy. The storage (blob containers) already does this verification. */
+
+        // Upload contents from byte array
+        blob.uploadFromByteArray(contents, 0, contents.length);
+
+        return Response
+                .status(Response.Status.OK)
+                .entity(nameOfImage)
+                .build();
     }
 
+    @Path("/{uid}")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public byte[] download(String uid) {
-        return null;
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response download(@PathParam("uid") String uid) {
+        CloudBlobContainer myContainer = getContainer();
+        byte[] contents = null;
+        try {
+            CloudBlob blob = myContainer.getBlobReferenceFromServer(uid);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            blob.download(out);
+            out.close();
+            contents = out.toByteArray();
+        } catch (Exception e) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+
+        return Response
+                .status(Response.Status.OK)
+                .entity(contents)
+                .build();
     }
 }
