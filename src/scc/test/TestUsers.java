@@ -35,18 +35,20 @@ public class TestUsers {
 
             System.out.println("Username: \n" + user.getName());
 
-            String id = target.path("/name")
+            String id = target.path("/users")
                     .request()
                     .accept(MediaType.TEXT_PLAIN)
                     .post(Entity.entity(user, MediaType.APPLICATION_JSON))
-                    .readEntity(String.class);
+                    .readEntity(String.class); // Test for creating user
 
             System.out.println("ID: \n" + id);
 
-            /*User u0 = target.path("/name/" + id)
+            User u0 = target.path("/users/" + id)
                     .request()
                     .accept(MediaType.APPLICATION_JSON)
-                    .get(User.class);*/
+                    .get(User.class); // Test to getting the last user created
+
+            System.out.println("User: \n" + u0.getId());
         } catch(Exception e) {
             e.printStackTrace();
         }

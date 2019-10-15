@@ -11,18 +11,18 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Iterator;
 
-@Path("/name")
+@Path("/users")
 public class UserResource {
-    static final String COSMOS_DB_ENDPOINT = "https://scc1920-cosmos.documents.azure.com:443/";
-    static final String COSMOS_DB_MASTER_KEY = "3vL9v7JBqZ1t0yzSNI5rUff1hWOCQRRi52eZ0A86KDw0yMAgT0OFPHPyLHmCcgeUP0cqQvfOlwoAMLsFABcHMg==";
-    static final String COSMOS_DB_DATABASE = "SCC-41631";
+    static final String COSMOS_DB_ENDPOINT = "https://scc1920-cosmos-41631.documents.azure.com:443/";
+    static final String COSMOS_DB_MASTER_KEY = "nVqL0ilEo945NoYxM0s0nROPmpgOpCpx20SLSghzinyML5x8bi7cQAN2tj2ne2W1YUKsH7l9k87YgNEtLV1hmQ==";
+    static final String COSMOS_DB_DATABASE = "SCC-4204";
 
     private static AsyncDocumentClient client;
 
     static synchronized AsyncDocumentClient getClient() {
         if (client == null) {
-            ConnectionPolicy connectionPolicy = new ConnectionPolicy();
-            connectionPolicy.setConnectionMode(ConnectionMode.Direct);
+            ConnectionPolicy connectionPolicy = ConnectionPolicy.GetDefault();
+            //connectionPolicy.setConnectionMode(ConnectionMode.);
             client = new AsyncDocumentClient.Builder()
                     .withServiceEndpoint(COSMOS_DB_ENDPOINT)
                     .withMasterKeyOrResourceToken(COSMOS_DB_MASTER_KEY)
@@ -73,6 +73,19 @@ public class UserResource {
                 UsersCollection,
                 "SELECT * FROM Users u WHERE u.id ='" + uid + "'",
                 queryOptions).toBlocking().getIterator();
+
+        /* while(it.hasNext()) {
+            for(Document d : it.next().getResults()) {
+                Gson g = new Gson();
+                toReturn = g.fromJson(d.toJson(), User.class);
+            }
+        } */
+
+        /*if(it.hasNext()) {
+            Gson g = new Gson();
+            String doc = it.next().getResults().get(0).toJson();
+            toReturn = g.fromJson(doc, User.class);
+        }*/
 
         while(it.hasNext()) {
             for(Document d : it.next().getResults()) {
