@@ -49,6 +49,12 @@ public class TestUsers {
                     .get(User.class); // Test to getting the last user created
 
             System.out.println("User: \n" + u0.getId());
+
+            /*User u1 = target.path("/users/all")
+                    .request()
+                    .accept(MediaType.APPLICATION_JSON)
+                    .get(User.class);*/
+            //System.out.println("User: " + u1.getName());
         } catch(Exception e) {
             e.printStackTrace();
         }

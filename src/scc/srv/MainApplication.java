@@ -14,6 +14,7 @@ public class MainApplication extends Application {
         set.add( MediaResource.class );
         set.add( PostResource.class );
         set.add( UserResource.class );
+        set.add( CDBConnection.class );
         return set;
     }
 }
