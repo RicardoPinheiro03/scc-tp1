@@ -1,6 +1,7 @@
 package scc.srv;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.microsoft.azure.cosmosdb.*;
 import com.microsoft.azure.cosmosdb.rx.AsyncDocumentClient;
 import rx.Observable;
@@ -51,9 +52,9 @@ public class UserResource {
                 "SELECT * FROM Users u WHERE u.id ='" + uid + "'",
                 queryOptions).toBlocking().getIterator();
 
-        String doc;
+        String doc = "";
+        Gson g = new Gson();
         if(it.hasNext()) {
-            Gson g = new Gson();
             doc = it.next().getResults().get(0).toJson();
             toReturn = g.fromJson(doc, User.class);
         }
@@ -69,7 +70,7 @@ public class UserResource {
         client.close();
         return Response
                 .status(Response.Status.OK)
-                .entity(toReturn)
+                .entity(g.toJson(toReturn))
                 .build();
     }
 
@@ -93,21 +94,21 @@ public class UserResource {
                 .toBlocking()
                 .getIterator();
 
-        Gson masterGson = new Gson();
+        JsonArray usersArray = new JsonArray();
+        Gson g = new Gson();
 
         while(it.hasNext()) {
-            for (Document d : it.next().getResults()) {
-                masterGson.toJson(d.toJson(), User.class);
+            for(Document d : it.next().getResults()) {
+                User user = g.fromJson(d.toJson(), User.class);
+                usersArray.add(g.toJson(user));
             }
         }
-
-        //return Response.status(Response.Status.OK).build();
 
         client.close();
 
         return Response
                 .status(Response.Status.OK)
-                .entity(masterGson)
+                .entity(g.toJson(usersArray))
                 .build();
     }
 }

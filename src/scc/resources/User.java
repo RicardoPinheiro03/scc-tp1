@@ -1,9 +1,8 @@
 package scc.resources;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class User {
+public class User implements Serializable {
     private String id;
     private String name;
 
