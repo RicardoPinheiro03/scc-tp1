@@ -11,6 +11,7 @@ import com.google.gson.JsonElement;
 import com.microsoft.azure.cosmosdb.*;
 import com.microsoft.azure.cosmosdb.rx.AsyncDocumentClient;
 
+import scc.resources.Post;
 import scc.resources.User;
 import scc.test.TestCDBConnection;
 
@@ -22,8 +23,9 @@ public class TestCosmosDB {
             System.out.println("Trying to connect to the client...");
             AsyncDocumentClient client = TestCDBConnection.getDocumentClient();
             //testUsersCollection(client);
-            testUsersRetrieval(client);
-            testGettingUserByID(client);
+            //testUsersRetrieval(client);
+            //testGettingUserByID(client);
+            getReplies(client);
             client.close();
             // create database if not exists
             /*List<Database> databaseList = client
@@ -183,5 +185,32 @@ public class TestCosmosDB {
         }
 
         client.close();
+    }
+
+    public static void getReplies(AsyncDocumentClient client) {
+        System.out.println("Creating a posts collection if unavailable...");
+        String collectionName = "Posts";
+        String pid = "289e04ca-35b0-4ccc-8247-17d118ed9e44";
+        FeedOptions queryOptions = new FeedOptions();
+        queryOptions.setEnableCrossPartitionQuery(true);
+        queryOptions.setMaxDegreeOfParallelism(-1);
+        Iterator<FeedResponse<Document>> it = client.queryDocuments(
+                collectionName,
+                "SELECT * FROM Posts p WHERE p.id ='" + pid + "'",
+                queryOptions).toBlocking().getIterator();
+        /*JsonArray repliesArray = new JsonArray();
+        Gson g = new Gson();
+
+        while(it.hasNext()) {
+            for(Document d : it.next().getResults()) {
+                Post reply = g.fromJson(d.toJson(), Post.class);
+                repliesArray.add(g.toJson(reply));
+            }
+        }
+        System.out.println(repliesArray);*/
+
+        if(it.hasNext()) {
+            System.out.println("Result: " + it.next().getResults().get(0).toJson());
+        }
     }
 }

@@ -17,7 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Iterator;
 
-@Path("/community")
+@Path("/comms")
 public class CommunityResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -25,8 +25,9 @@ public class CommunityResource {
     public String addCommunity(Community comm) {
         try {
             AsyncDocumentClient client = CDBConnection.getDocumentClient();
-            String PostCollection = CDBConnection.getCollectionString("Communities");
-            Observable<ResourceResponse<Document>> resp = client.createDocument(PostCollection, comm, null, false);
+            String CommunityCollection = CDBConnection.getCollectionString("Communities");
+            Observable<ResourceResponse<Document>> resp = client.createDocument(CommunityCollection, comm, null, false);
+            //client.close();
             return resp.toBlocking().first().getResource().getId();
         } catch(Exception e) {
             throw new WebApplicationException(Response.status(Response.Status.CONFLICT).build());
@@ -55,6 +56,8 @@ public class CommunityResource {
             String doc = it.next().getResults().get(0).toJson();
             toReturn = g.fromJson(doc, Community.class);
         }
+
+        //client.close();
 
         return Response
                 .status(Response.Status.OK)

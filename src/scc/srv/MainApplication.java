@@ -11,6 +11,7 @@ public class MainApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> set = new HashSet<>();
+        set.add( CommunityResource.class );
         set.add( MediaResource.class );
         set.add( PostResource.class );
         set.add( UserResource.class );

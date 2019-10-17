@@ -95,7 +95,7 @@ public class UserResource {
             }
         }
 
-        //client.close();
+        // client.close();
 
         return Response
                 .status(Response.Status.OK)

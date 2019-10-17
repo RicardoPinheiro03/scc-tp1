@@ -1,17 +1,19 @@
 package scc.resources;
 
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Community implements Serializable {
     private String id;
-    private String communityName;
+    private String name;
 
-    public String getCommunityName() {
-        return communityName;
+    public String getName() {
+        return name;
     }
 
-    public void setName(String communityName) {
-        this.communityName = communityName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getId() {

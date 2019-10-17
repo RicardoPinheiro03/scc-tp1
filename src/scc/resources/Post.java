@@ -1,13 +1,16 @@
 package scc.resources;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Post implements Serializable {
     private String id;
     private String communityName;
     private String userCreator;
-    private Date dateOfCreation;
+    private Long dateOfCreation;
     private String linkMultimedia;
     private String refParent;
     private int numberLikes;
@@ -18,7 +21,7 @@ public class Post implements Serializable {
 
     public String getUserCreator() { return userCreator; }
 
-    public Date getDateOfCreation() { return dateOfCreation; }
+    public Long getDateOfCreation() { return dateOfCreation; }
 
     public String getLinkMultimedia() { return linkMultimedia; }
 
@@ -38,7 +41,7 @@ public class Post implements Serializable {
 
     public void setUserCreator(String userCreator) { this.userCreator = userCreator; }
 
-    public void setDateOfCreation(Date dateOfCreation) { this.dateOfCreation = dateOfCreation; }
+    public void setDateOfCreation(Long dateOfCreation) { this.dateOfCreation = dateOfCreation; }
 
     public void setLinkMultimedia(String linkMultimedia) { this.linkMultimedia = linkMultimedia; }
 
