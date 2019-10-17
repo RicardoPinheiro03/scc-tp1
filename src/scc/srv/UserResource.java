@@ -23,7 +23,7 @@ public class UserResource {
             AsyncDocumentClient client = CDBConnection.getDocumentClient();
             String UsersCollection = CDBConnection.getCollectionString("Users");
             Observable<ResourceResponse<Document>> resp = client.createDocument(UsersCollection, user, null, false);
-            client.close();
+            //client.close();
             return resp.toBlocking().first().getResource().getId();
         } catch (Exception e) {
             throw new WebApplicationException(Response.status(Response.Status.CONFLICT).build());
@@ -52,22 +52,13 @@ public class UserResource {
                 "SELECT * FROM Users u WHERE u.id ='" + uid + "'",
                 queryOptions).toBlocking().getIterator();
 
-        String doc = "";
         Gson g = new Gson();
         if(it.hasNext()) {
-            doc = it.next().getResults().get(0).toJson();
+            String doc = it.next().getResults().get(0).toJson();
             toReturn = g.fromJson(doc, User.class);
         }
 
-        System.out.println("ToReturn: \n " + toReturn.getId() + "" + toReturn.getName());
-
-        /*while(it.hasNext()) {
-            for(Document d : it.next().getResults()) {
-                Gson g = new Gson();
-                toReturn = g.fromJson(d.toJson(), User.class);
-            }
-        }*/
-        client.close();
+        //client.close();
         return Response
                 .status(Response.Status.OK)
                 .entity(g.toJson(toReturn))
@@ -104,7 +95,7 @@ public class UserResource {
             }
         }
 
-        client.close();
+        //client.close();
 
         return Response
                 .status(Response.Status.OK)

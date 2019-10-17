@@ -26,9 +26,9 @@
     <dependency> 
       <groupId>com.microsoft.azure</groupId>  
       <artifactId>azure-cosmosdb</artifactId>  
-      <version>3.0.0-beta-2</version> 
+      <version>3.0.0-beta-3</version> 
     </dependency>  
-    <!--<dependency>
+    <dependency> 
       <groupId>org.apache.commons</groupId>  
       <artifactId>commons-lang3</artifactId>  
       <version>3.9</version> 
@@ -37,7 +37,7 @@
       <groupId>org.slf4j</groupId>  
       <artifactId>slf4j-simple</artifactId>  
       <version>1.7.24</version> 
-    </dependency>  -->  
+    </dependency>  
     <dependency> 
       <groupId>com.google.code.gson</groupId>  
       <artifactId>gson</artifactId>  
@@ -93,7 +93,7 @@
         <version>1.7.0</version>  
         <configuration> 
           <schemaVersion>V2</schemaVersion>  
-          <pricingTier>F1</pricingTier>  
+          <pricingTier>B1</pricingTier>  
           <region>westeurope</region>  
           <runtime> 
             <os>linux</os>  

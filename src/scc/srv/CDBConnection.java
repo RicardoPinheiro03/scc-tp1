@@ -6,7 +6,7 @@ import com.microsoft.azure.cosmosdb.rx.AsyncDocumentClient;
 
 public class CDBConnection {
     static final String COSMOS_DB_ENDPOINT = "https://scc1920-cosmos-41631.documents.azure.com:443/";
-    static final String COSMOS_DB_MASTER_KEY = "uxzMP54FheKa4EIXizgWHPoRYAG0WPFir3mAvEMNPkfAt0SIf34YHmxYSmmnG6ugnKQHgQfELloBDbFM0R3f0g==";
+    static final String COSMOS_DB_MASTER_KEY = "GHWmlFwnMhKG4pVOuFHxgLgxsiD7BnbAqvxCvK8nIS1Da46ri15rZkeZwyFWkcZv1PoREgyU5RmhTb1swq7uoQ==";
     static final String COSMOS_DB_DATABASE = "SCC-4204";
 
     private static AsyncDocumentClient client;

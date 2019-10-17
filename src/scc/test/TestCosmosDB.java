@@ -23,6 +23,8 @@ public class TestCosmosDB {
             AsyncDocumentClient client = TestCDBConnection.getDocumentClient();
             //testUsersCollection(client);
             testUsersRetrieval(client);
+            testGettingUserByID(client);
+            client.close();
             // create database if not exists
             /*List<Database> databaseList = client
                     .queryDatabases("SELECT * FROM root r WHERE r.id='" + TestCDBConnection.COSMOS_DB_DATABASE + "'", null).toBlocking()
@@ -116,8 +118,31 @@ public class TestCosmosDB {
         }*/
 
         //System.out.println(masterJson);
+    }
 
-        client.close();
+    public static void testGettingUserByID(AsyncDocumentClient client) {
+        System.out.println("Testing the retrieval of one user...");
+
+        FeedOptions queryOptions = new FeedOptions();
+        queryOptions.setEnableCrossPartitionQuery(true);
+        queryOptions.setMaxDegreeOfParallelism(-1);
+
+        String id = "9d51e27e-0b6e-4b85-9071-ff22c5a8809b";
+
+        String usersCollection = TestCDBConnection.getCollectionString(USERS_COLLECTION);
+
+        Iterator<FeedResponse<Document>> it = client.queryDocuments(usersCollection,
+                "SELECT * FROM Users u WHERE u.id ='" + id + "'",
+                queryOptions).toBlocking().getIterator();
+
+        Gson returnJson = new Gson();
+        if(it.hasNext()) {
+            String doc = it.next().getResults().get(0).toJson();
+            User toReturn = returnJson.fromJson(doc, User.class);
+            System.out.println("User Object: " + toReturn + "\n" +
+                    "User Name: " + toReturn.getName() + "\n ID: " + toReturn.getId() + "\n Json Object: " +
+                    returnJson.toJson(toReturn));
+        }
     }
 
     public static void testUsersCollection(AsyncDocumentClient client) {

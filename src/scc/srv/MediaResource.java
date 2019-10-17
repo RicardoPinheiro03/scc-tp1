@@ -89,7 +89,7 @@ public class MediaResource {
 
     @Path("/{uid}")
     @GET
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces({"image/png", "image/jpeg", "image/gif"})
     public Response download(@PathParam("uid") String uid) {
         CloudBlobContainer myContainer = getContainer();
         byte[] contents = null;
