@@ -3,15 +3,28 @@ package scc.srv;
 import com.microsoft.azure.cosmosdb.ConnectionPolicy;
 import com.microsoft.azure.cosmosdb.ConsistencyLevel;
 import com.microsoft.azure.cosmosdb.rx.AsyncDocumentClient;
+import scc.utils.AzureProperties;
+
+import java.util.Properties;
 
 public class CDBConnection {
-    static final String COSMOS_DB_ENDPOINT = "https://scc1920-cosmos-41631.documents.azure.com:443/";
-    static final String COSMOS_DB_MASTER_KEY = "GHWmlFwnMhKG4pVOuFHxgLgxsiD7BnbAqvxCvK8nIS1Da46ri15rZkeZwyFWkcZv1PoREgyU5RmhTb1swq7uoQ==";
-    static final String COSMOS_DB_DATABASE = "SCC-4204";
+    static String COSMOS_DB_ENDPOINT = "";
+    static String COSMOS_DB_MASTER_KEY = "";
+    static String COSMOS_DB_DATABASE = "";
+    /* static final String COSMOS_DB_ENDPOINT = AzureProperties.COSMOSDB_URL;
+    //"https://scc1920-cosmos-41631.documents.azure.com:443/";
+    static final String COSMOS_DB_MASTER_KEY = AzureProperties.COSMOSDB_KEY;
+    //"OsaUANGQMKhi3hHoywsV40M6SyVSzCcZUISzq23XF/3pqt9HEBqfhUd29ONdjVTqA51uOMZ6xMToAVv4VZPegw==";
+    static final String COSMOS_DB_DATABASE = AzureProperties.COSMOSDB_DATABASE;
+    //"SCC-4204"; */
 
     private static AsyncDocumentClient client;
 
     static synchronized AsyncDocumentClient getDocumentClient() {
+        Properties props = AzureProperties.getProperties();
+        COSMOS_DB_ENDPOINT = props.getProperty("COSMOSDB_URL");
+        COSMOS_DB_MASTER_KEY = props.getProperty("COSMOSDB_KEY");
+        COSMOS_DB_DATABASE = props.getProperty("COSMOSDB_DATABASE");
         if(client == null) {
             ConnectionPolicy connectionPolicy = ConnectionPolicy.GetDefault();
             client = new AsyncDocumentClient.Builder()

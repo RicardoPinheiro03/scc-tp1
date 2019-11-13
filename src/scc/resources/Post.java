@@ -3,12 +3,11 @@ package scc.resources;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
-import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Post implements Serializable {
     private String id;
-    private String communityName;
+    private String community;
     private String userCreator;
     private Long dateOfCreation;
     private String linkMultimedia;
@@ -17,7 +16,7 @@ public class Post implements Serializable {
     private String title;
     private String textMessage;
 
-    public String getCommunityName() { return communityName; }
+    public String getCommunity() { return community; }
 
     public String getUserCreator() { return userCreator; }
 
@@ -37,7 +36,7 @@ public class Post implements Serializable {
 
     public int getNumberLikes() { return numberLikes; }
 
-    public void setCommunityName(String communityName) { this.communityName = communityName; }
+    public void setCommunity(String community) { this.community = community; }
 
     public void setUserCreator(String userCreator) { this.userCreator = userCreator; }
 
@@ -48,6 +47,8 @@ public class Post implements Serializable {
     public void setRefParent(String refParent) { this.refParent = refParent; }
 
     public void setNumberLikes() { this.numberLikes++; } // Doesn't we have to have the reference to the user who liked?
+
+    public void unsetNumberLikes() { this.numberLikes--; }
 
     public void setId(String id) {
         this.id = id;

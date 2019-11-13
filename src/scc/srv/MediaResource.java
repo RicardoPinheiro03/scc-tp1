@@ -7,37 +7,26 @@ import com.microsoft.azure.storage.StorageException;
 import com.microsoft.azure.storage.blob.CloudBlob;
 import com.microsoft.azure.storage.blob.CloudBlobClient;
 import com.microsoft.azure.storage.blob.CloudBlobContainer;
+import scc.utils.AzureProperties;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.HashMap;
+import java.util.Properties;
 
 @Path("/media")
 public class MediaResource {
-
-    //public static int NO_OF_IMAGES = 10000;
-    //private HashMap<String, byte[]> images = new HashMap<>(NO_OF_IMAGES);
-    //private String nameOfImage;
-
-	//TODO: Method to be removed
-    /*@GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public String hello() {
-        return "Hello world !!! -- TO BE REMOVED";
-    }*/
-
     public CloudBlobContainer getContainer() {
-        String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=scc41631;AccountKey=OsaUANGQMKhi3hHoywsV40M6SyVSzCcZUISzq23XF/3pqt9HEBqfhUd29ONdjVTqA51uOMZ6xMToAVv4VZPegw==;EndpointSuffix=core.windows.net";
+        Properties props = AzureProperties.getProperties(); // Get the properties from the file
+        String storageConnectionString = props.getProperty("BLOB_KEY");
+        //AzureProperties.BLOB_KEY;
         CloudStorageAccount storageAccount = null;
         CloudBlobContainer container = null;
         try {

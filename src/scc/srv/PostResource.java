@@ -2,10 +2,7 @@ package scc.srv;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.microsoft.azure.cosmosdb.Document;
-import com.microsoft.azure.cosmosdb.FeedOptions;
-import com.microsoft.azure.cosmosdb.FeedResponse;
-import com.microsoft.azure.cosmosdb.ResourceResponse;
+import com.microsoft.azure.cosmosdb.*;
 import com.microsoft.azure.cosmosdb.rx.AsyncDocumentClient;
 import javafx.application.Application;
 import rx.Observable;
@@ -96,19 +93,20 @@ public class PostResource {
                 .build();
     }
 
-    @Path("/all")
+    /*@Path("/all")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPosts() {
         AsyncDocumentClient client = CDBConnection.getDocumentClient();
         String PostsCollection = CDBConnection.getCollectionString("Posts");
+        String emptyString = "''";
 
         FeedOptions queryOptions = new FeedOptions();
         queryOptions.setEnableCrossPartitionQuery(true);
         queryOptions.setMaxDegreeOfParallelism(-1);
 
         Iterator<FeedResponse<Document>> it = client
-                .queryDocuments(PostsCollection, "SELECT * FROM Posts WHERE p.refParent IS NULL", queryOptions)
+                .queryDocuments(PostsCollection, "SELECT * FROM Posts WHERE p.refParent = '" + emptyString + "'" , queryOptions)
                 .toBlocking()
                 .getIterator();
 
@@ -126,7 +124,7 @@ public class PostResource {
                 .status(Response.Status.OK)
                 .entity(g.toJson(postsArray))
                 .build();
-    }
+    } */
 
     @Path("/{pid}/replies")
     @POST
@@ -140,8 +138,13 @@ public class PostResource {
         return resp.toBlocking().first().getResource().getId();
     }
 
+    /**
+     * Retrieve a thread (main post and replies) by main post ID.
+     * @param pid
+     * @return JSON Array with all the replies
+     */
     @Path("/{pid}/all")
-    @GET
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllReplies(@PathParam("pid") String pid) {
         AsyncDocumentClient client = CDBConnection.getDocumentClient();
@@ -151,13 +154,23 @@ public class PostResource {
         queryOptions.setEnableCrossPartitionQuery(true);
         queryOptions.setMaxDegreeOfParallelism(-1);
 
-        Iterator<FeedResponse<Document>> it = client.queryDocuments(
+        JsonArray repliesArray = new JsonArray();
+        Gson g = new Gson();
+
+        Iterator<FeedResponse<Document>> it = client.queryDocuments(PostCollection,
+                "SELECT * FROM Posts p WHERE p.id ='" + pid + "'",
+                queryOptions).toBlocking().getIterator();
+
+        if(it.hasNext()) {
+            String doc = it.next().getResults().get(0).toJson();
+            Post mainPost = g.fromJson(doc, Post.class);
+            repliesArray.add(g.toJson(mainPost));
+        }
+
+        it = client.queryDocuments(
                 PostCollection,
                 "SELECT * FROM Posts p WHERE p.refParent ='" + pid + "'",
                 queryOptions).toBlocking().getIterator();
-
-        JsonArray repliesArray = new JsonArray();
-        Gson g = new Gson();
 
         while(it.hasNext()) {
             for(Document d : it.next().getResults()) {
@@ -172,4 +185,111 @@ public class PostResource {
                 .build();
     }
 
+    @Path("/{pid}/like/{uid}")
+    @GET
+    //@Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String likePost(@PathParam("pid") String pid, @PathParam("uid") String uid) {
+        AsyncDocumentClient client = CDBConnection.getDocumentClient();
+        String PostCollection = CDBConnection.getCollectionString("Posts");
+        String UserCollection = CDBConnection.getCollectionString("Users");
+        Post p;
+        Observable<ResourceResponse<Document>> resp;
+
+        FeedOptions queryOptions = new FeedOptions();
+        queryOptions.setEnableCrossPartitionQuery(true);
+        queryOptions.setMaxDegreeOfParallelism(-1);
+
+        Iterator<FeedResponse<Document>> it = client.queryDocuments(PostCollection,
+                "SELECT * FROM Posts p WHERE p.id ='" + pid + "'",
+                queryOptions).toBlocking().getIterator();
+
+
+        Iterator<FeedResponse<Document>> it_ = client.queryDocuments(UserCollection,
+                "SELECT * FROM Users u WHERE u.id ='" + uid + "'",
+                queryOptions).toBlocking().getIterator();
+
+        if(!it_.hasNext()) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build());
+        }
+
+        Gson g = new Gson();
+        if(it.hasNext()) {
+            Document doc0 = it.next().getResults().get(0);
+            String doc = doc0.toJson();
+            p = g.fromJson(doc, Post.class);
+            p.setNumberLikes();
+            resp = client.replaceDocument(doc0.getSelfLink(), p, null);
+            //client.replaceDocument(doc_, p, null);
+
+            //client.replaceDocument(doc, p, requestOptions);
+            //client.deleteDocument(doc, requestOptions);
+            //resp = client.createDocument(PostCollection, p, null, false);
+        } else {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build());
+        }
+
+        //System.out.println("POST: " + p);
+
+        /*return Response
+                .status(Response.Status.OK)
+                .entity(g.toJson(p))
+                .build();*/
+        return resp.toBlocking().first().getResource().getId();
+    }
+
+    // 8 of november
+
+    // lab 7 zip is one maven project with azure functions
+
+    // for report:
+    // -- deploy app for eu-west and use artillery to test the performance
+    // -- deploy app on us asia
+    // -- deploy app without cache (turned off -- how to do this?)
+
+    // -- don't forget to create tests for the front page (artillery)
+
+    @Path("/{pid}/unlike/{uid}")
+    @GET
+    //@Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response unlikePost(@PathParam("uid") String uid, @PathParam("pid") String pid) {
+        AsyncDocumentClient client = CDBConnection.getDocumentClient();
+        String PostCollection = CDBConnection.getCollectionString("Posts");
+        String UserCollection = CDBConnection.getCollectionString("Users");
+        Post p;
+        Observable<ResourceResponse<Document>> resp;
+
+        FeedOptions queryOptions = new FeedOptions();
+        queryOptions.setEnableCrossPartitionQuery(true);
+        queryOptions.setMaxDegreeOfParallelism(-1);
+
+        Iterator<FeedResponse<Document>> it = client.queryDocuments(PostCollection,
+                "SELECT * FROM Posts p WHERE p.id ='" + pid + "'",
+                queryOptions).toBlocking().getIterator();
+
+        Iterator<FeedResponse<Document>> it_ = client.queryDocuments(UserCollection,
+                "SELECT * FROM Users u WHERE u.id ='" + uid + "'",
+                queryOptions).toBlocking().getIterator();
+
+        if(!it_.hasNext()) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build());
+        }
+
+        Gson g = new Gson();
+        if(it.hasNext()) {
+            Document d0 = it.next().getResults().get(0);
+            p = g.fromJson(d0.toJson(), Post.class);
+            p.unsetNumberLikes();
+            client.replaceDocument(d0.getSelfLink(), p, null);
+        } else {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build());
+        }
+
+        return Response
+                .status(Response.Status.OK)
+                .entity(g.toJson(p))
+                .build();
+        //return resp.toBlocking().first().getResource().getId();
+    }
 }

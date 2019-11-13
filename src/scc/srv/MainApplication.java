@@ -1,5 +1,7 @@
 package scc.srv;
 
+import scc.utils.AzureProperties;
+
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
@@ -16,6 +18,8 @@ public class MainApplication extends Application {
         set.add( PostResource.class );
         set.add( UserResource.class );
         set.add( CDBConnection.class );
+        set.add( MainResource.class );
+        set.add( AzureProperties.class );
         return set;
     }
 }

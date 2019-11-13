@@ -64,13 +64,66 @@
       <version>2.29.1</version> 
     </dependency>  
     <dependency> 
+      <groupId>redis.clients</groupId>  
+      <artifactId>jedis</artifactId>  
+      <version>2.9.0</version>  
+      <type>jar</type>  
+      <scope>compile</scope> 
+    </dependency>  
+    <dependency> 
       <groupId>org.glassfish.jersey.media</groupId>  
       <artifactId>jersey-media-json-jackson</artifactId>  
       <version>2.29.1</version> 
+    </dependency>  
+    <dependency> 
+      <groupId>com.microsoft.azure</groupId>  
+      <artifactId>azure</artifactId>  
+      <version>1.27.0</version> 
+    </dependency>  
+    <dependency> 
+      <groupId>com.microsoft.azure</groupId>  
+      <artifactId>azure-storage</artifactId>  
+      <version>8.4.0</version> 
+    </dependency>  
+    <dependency> 
+      <groupId>com.microsoft.azure</groupId>  
+      <artifactId>azure-storage-blob</artifactId>  
+      <version>11.0.1</version> 
+    </dependency>  
+    <dependency> 
+      <groupId>redis.clients</groupId>  
+      <artifactId>jedis</artifactId>  
+      <version>2.9.0</version>  
+      <type>jar</type>  
+      <scope>compile</scope> 
     </dependency> 
   </dependencies>  
   <build> 
     <sourceDirectory>src</sourceDirectory>  
+    <pluginManagement> 
+      <plugins> 
+        <plugin> 
+          <groupId>com.microsoft.azure</groupId>  
+          <artifactId>azure-functions-maven-plugin</artifactId>  
+          <version>${azure.functions.maven.plugin.version}</version> 
+        </plugin>  
+        <plugin> 
+          <groupId>org.apache.maven.plugins</groupId>  
+          <artifactId>maven-resources-plugin</artifactId>  
+          <version>3.1.0</version> 
+        </plugin>  
+        <plugin> 
+          <groupId>org.apache.maven.plugins</groupId>  
+          <artifactId>maven-dependency-plugin</artifactId>  
+          <version>3.1.1</version> 
+        </plugin>  
+        <plugin> 
+          <groupId>org.apache.maven.plugins</groupId>  
+          <artifactId>maven-clean-plugin</artifactId>  
+          <version>3.1.0</version> 
+        </plugin> 
+      </plugins> 
+    </pluginManagement>  
     <plugins> 
       <plugin> 
         <artifactId>maven-compiler-plugin</artifactId>  
@@ -110,7 +163,7 @@
               </resource> 
             </resources> 
           </deployment>  
-          <resourceGroup>scc-backend-rg-41631</resourceGroup>  
+          <resourceGroup>scc-backend-euwest-41631</resourceGroup>  
           <appName>scc-backend-41631</appName> 
         </configuration> 
       </plugin> 
