@@ -115,6 +115,7 @@ public class MainResource {
 
         try(Jedis jedis = jp.getResource()) {
             List<String> lst = jedis.lrange("MostLikedPosts", 0, 5);
+            // System.out.println("Pos 1 Most Liked Posts: " + lst.get(0));
 
             if(lst.isEmpty()) {
                 // The query misses the number of likes. TODO

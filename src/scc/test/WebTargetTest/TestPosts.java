@@ -1,4 +1,4 @@
-package scc.test;
+package scc.test.WebTargetTest;
 
 import org.glassfish.jersey.client.ClientConfig;
 import scc.resources.Post;
@@ -112,10 +112,16 @@ public class TestPosts {
                     .readEntity(String.class);*/
 
             // System.out.println("post 1: " + post + "post 2: " + post2);
-            Post post1 = new Post();
+            /* Post post1 = new Post();
             post1.setCommunity("something");
             post1.setTitle("benfica");
             post1.setTextMessage("benfica europeu");
+            post1.setRefParent(""); */
+
+            Post post1 = new Post();
+            post1.setCommunity("something");
+            post1.setTitle("luisfelipevieira");
+            post1.setTextMessage("este gajo é um palhaço");
             post1.setRefParent("");
 
             String response =  target.path("/post")

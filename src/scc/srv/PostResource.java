@@ -7,7 +7,7 @@ import com.microsoft.azure.cosmosdb.rx.AsyncDocumentClient;
 import javafx.application.Application;
 import rx.Observable;
 import scc.resources.Post;
-import scc.resources.User;
+//import scc.resources.User;
 
 import javax.ws.rs.*;
 import javax.inject.Inject;
@@ -42,7 +42,7 @@ public class PostResource {
 
             Iterator<FeedResponse<Document>> it = client.queryDocuments(
                     CommunityCollection,
-                    "SELECT * FROM Communities c WHERE c.name ='" + post.getCommunityName() + "'",
+                    "SELECT * FROM Communities c WHERE c.name ='" + post.getCommunity() + "'",
                     queryOptions).toBlocking().getIterator();
 
             //client.close();

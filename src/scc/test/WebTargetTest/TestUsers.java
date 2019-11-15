@@ -1,4 +1,4 @@
-package scc.test;
+package scc.test.WebTargetTest;
 
 
 import javax.ws.rs.client.Client;

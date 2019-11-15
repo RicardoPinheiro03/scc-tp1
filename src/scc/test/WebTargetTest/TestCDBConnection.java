@@ -1,4 +1,4 @@
-package scc.test;
+package scc.test.WebTargetTest;
 
 import com.microsoft.azure.cosmosdb.ConnectionPolicy;
 import com.microsoft.azure.cosmosdb.ConsistencyLevel;

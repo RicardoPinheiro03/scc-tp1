@@ -1,4 +1,4 @@
-package scc.test;
+package scc.test.WebTargetTest;
 
 import org.glassfish.jersey.client.ClientConfig;
 import scc.resources.Community;

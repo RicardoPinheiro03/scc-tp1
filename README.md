@@ -37,18 +37,24 @@ client -- https://stackoverflow.com/questions/52571211/error-connection-reset-by
 
 2) Correct the code on the update of the post number of likes. *DONE*
 
-3) The caching system with REDIS is to correct. *ATM* -- maybe add caching in some other features. Also, test the redis-cli
+3) The caching system with REDIS is to correct. *SEMI-DONE* -- maybe add caching in some other features. Also, test the redis-cli
 to see if the data is there. The data is not being saved on REDIS.
 
 -- The redis-cli is supposed to be turned off when flagged. This is a TODO implementation.
 
-3.a) Commit changes to GitHub
+-- The cache is good for now. Go to 4. Meanwhile, remember to come here.
 
-4) The testing framework is to implement as well.
+3.a) Commit changes to GitHub *DONE*
+
+4) The testing framework is to implement as well. *ATM*
+
+-- Make the scripts with more test cases.   
 
 5) Implement the serverless functions. Go to the pratical lecture on Friday.
 
 6) See the new file about the project -- geo-replication, testing, 
+
+7) Implement the Advanced Search ... 
 
 - Executar o azuremanagement (ou seja mandar tudo abaixo e deixar a classe executar) DONE
 

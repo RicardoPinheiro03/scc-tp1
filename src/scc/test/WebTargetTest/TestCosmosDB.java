@@ -1,19 +1,15 @@
-package scc.test;
+package scc.test.WebTargetTest;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.microsoft.azure.cosmosdb.*;
 import com.microsoft.azure.cosmosdb.rx.AsyncDocumentClient;
 
-import scc.resources.Post;
 import scc.resources.User;
-import scc.test.TestCDBConnection;
 
 public class TestCosmosDB {
     public static String USERS_COLLECTION = "Users";

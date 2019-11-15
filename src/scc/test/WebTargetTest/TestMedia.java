@@ -1,4 +1,4 @@
-package scc.test;
+package scc.test.WebTargetTest;
 
 import java.io.File;
 import java.io.FileInputStream;
