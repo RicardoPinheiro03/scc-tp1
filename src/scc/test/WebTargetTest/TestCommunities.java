@@ -29,7 +29,7 @@ public class TestCommunities {
             WebTarget target = client.target(baseURI);
 
             Community comm = new Community();
-            comm.setName("something");
+            comm.setName("outra");
 
             String res = target.path("/comms")
                     .request()

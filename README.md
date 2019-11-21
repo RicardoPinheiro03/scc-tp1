@@ -11,7 +11,7 @@ Execute this command on the source of the project:
     mvn wildfly:undeploy - undeploy the quickstart
 
 ### Instructions to debug the redis server
-- Install stunnel and then create a file on /etc/stunnel/ named redis-cli.conf
+- Install stunnel and then create a file on `/etc/stunnel/` named `redis-cli.conf`
 - Insert the following information:
     ```bash
       [redis-cli]
@@ -30,6 +30,13 @@ Execute this command on the source of the project:
 
 TODO: write here the previous steps to turn on the stunnel with the configurations and the new way to access the 
 client -- https://stackoverflow.com/questions/52571211/error-connection-reset-by-peer-while-connecting-to-elastic-cache-using-stunnal.
+
+### Instructions to run all the tests
+On the test directory, inside source, execute the following commands:
+    ```bash
+       chmod +x ./run_all_tests.sh
+       ./run_all_tests.sh
+    ```
 
 ### TODO notes
 
@@ -50,17 +57,13 @@ to see if the data is there. The data is not being saved on REDIS.
 
 -- Make the scripts with more test cases.   
 
-5) Implement the serverless functions. Go to the pratical lecture on Friday.
+5) Implement the serverless functions. *ALMOST DONE*
 
-6) See the new file about the project -- geo-replication, testing, 
+-- It misses the testing for the cache that is coded there, and then change for MostLikedPosts.
 
-7) Implement the Advanced Search ... 
+6) See the new file about the project -- geo-replication, testing, ...
 
-- Executar o azuremanagement (ou seja mandar tudo abaixo e deixar a classe executar) DONE
+7) Implement the Advanced Search.
 
-- Refactor no MediaResource (em principio, a cosmosdb n precisa de mais alteracoes) DONE
-
-- Fazer deploy e ver se ta tudo correcto DONE
-
-- GOTO 2
+8) Azure Mgmt needs geo-replication as well.
 

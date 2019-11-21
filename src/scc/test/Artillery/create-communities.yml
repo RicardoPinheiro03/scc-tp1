@@ -1,6 +1,6 @@
 #Create initial set of communities
 config:
-  target: 'https://scc-backend-41631.azurewebsites.net'
+  target: 'http://scc-backend-41631.azurewebsites.net'
   http:
     pool: 10
   processor: "./test-utils.js"
@@ -14,10 +14,10 @@ scenarios:
       - loop:
         - function: "genNewCommunity"
         - post:
-            url: "/community"
+            url: "/comms"
             headers:
               Accept: text/plain
             json:
               name: "{{ name }}"
-        count: 30
+        count: 250
           

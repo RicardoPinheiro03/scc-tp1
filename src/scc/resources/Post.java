@@ -3,6 +3,8 @@ package scc.resources;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Post implements Serializable {
@@ -15,6 +17,9 @@ public class Post implements Serializable {
     private int numberLikes;
     private String title;
     private String textMessage;
+    private List<String> likedPost;
+
+    public List<String> getListWhoLiked() { return likedPost; }
 
     public String getCommunity() { return community; }
 
@@ -46,9 +51,32 @@ public class Post implements Serializable {
 
     public void setRefParent(String refParent) { this.refParent = refParent; }
 
-    public void setNumberLikes() { this.numberLikes++; } // Doesn't we have to have the reference to the user who liked?
+    public void setNumberLikes(String id) {
+        boolean found = false;
 
-    public void unsetNumberLikes() { this.numberLikes--; }
+        if(!likedPost.isEmpty()) {
+            for(String s : likedPost) {
+                if(id.equals(s)) {
+                    found = true;
+                }
+            }
+        } // correct this TODO
+
+        if(!found || likedPost.isEmpty()) {
+            likedPost.add(id);
+            this.numberLikes++;
+        }
+
+    } // Doesn't we have to have the reference to the user who liked?
+
+    /*public void setNumberLikes() {
+        this.numberLikes++;
+    }*/
+
+    public void unsetNumberLikes(String id) {
+        this.numberLikes--;
+        likedPost.remove(id);
+    }
 
     public void setId(String id) {
         this.id = id;

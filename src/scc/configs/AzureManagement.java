@@ -43,7 +43,7 @@ public class AzureManagement
     // This file should be created by running in the console:
     // az ad sp create-for-rbac --sdk-auth > azure.auth
     static final String AZURE_AUTH_LOCATION = "./src/scc/configs/azure.auth";
-    static final String AZURE_PROPS_LOCATION = "/home/the-user/Desktop/College/SCC/Labs/scc-backend/WebContent/WEB-INF/azure.props";
+    static final String AZURE_PROPS_LOCATION = "azure.props";
 
     static final String MY_SUFFIX = "41631"; // Add your suffix here
 
@@ -262,6 +262,8 @@ public class AzureManagement
     public static RedisCache createRedis(Azure azure, String rgName, String name, Region region) {
         Creatable<RedisCache> redisCacheDefinition = azure.redisCaches().define(name).withRegion(region)
                 .withNewResourceGroup(rgName).withBasicSku(0);
+
+        System.out.println("Redis cache created with success: name = " + name);
 
         return azure.redisCaches().create(redisCacheDefinition).get(redisCacheDefinition.key());
     }

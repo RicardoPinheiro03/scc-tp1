@@ -47,8 +47,8 @@ public class MediaResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response upload(byte[] contents) throws URISyntaxException, InvalidKeyException, StorageException, IOException, NoSuchAlgorithmException {
+    @Produces(MediaType.TEXT_PLAIN)
+    public String upload(byte[] contents) throws URISyntaxException, InvalidKeyException, StorageException, IOException, NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         //md.update(contents);
         byte[] digest = md.digest(contents); // get the hash of the contents for the UID (Unique Identifier)
@@ -70,10 +70,12 @@ public class MediaResource {
         // Upload contents from byte array
         blob.uploadFromByteArray(contents, 0, contents.length);
 
-        return Response
+        return nameOfImage;
+
+        /*Response
                 .status(Response.Status.OK)
                 .entity(nameOfImage)
-                .build();
+                .build();*/
     }
 
     @Path("/{uid}")

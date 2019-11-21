@@ -15,7 +15,7 @@ public class AzureProperties {
     public static final String REDIS_KEY = "REDIS_KEY";
     public static final String REDIS_URL = "REDIS_URL";
 
-    public static final String PROPS_FILE = "/home/site/wwwroot/webapps/ROOT/WEB-INF/azure.props";
+    public static final String PROPS_FILE = "/home/site/wwwroot/azure.props";
     public static Properties props; // ==== Try private as well ====
 
     public static synchronized Properties getProperties()  {

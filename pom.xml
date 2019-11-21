@@ -20,11 +20,6 @@
     </dependency>  
     <dependency> 
       <groupId>com.microsoft.azure</groupId>  
-      <artifactId>azure-storage</artifactId>  
-      <version>8.4.0</version> 
-    </dependency>  
-    <dependency> 
-      <groupId>com.microsoft.azure</groupId>  
       <artifactId>azure-cosmosdb</artifactId>  
       <version>3.0.0-beta-3</version> 
     </dependency>  
@@ -62,13 +57,6 @@
       <groupId>org.glassfish.jersey.inject</groupId>  
       <artifactId>jersey-hk2</artifactId>  
       <version>2.29.1</version> 
-    </dependency>  
-    <dependency> 
-      <groupId>redis.clients</groupId>  
-      <artifactId>jedis</artifactId>  
-      <version>2.9.0</version>  
-      <type>jar</type>  
-      <scope>compile</scope> 
     </dependency>  
     <dependency> 
       <groupId>org.glassfish.jersey.media</groupId>  
@@ -137,7 +125,16 @@
         <artifactId>maven-war-plugin</artifactId>  
         <version>3.2.1</version>  
         <configuration> 
-          <warSourceDirectory>WebContent</warSourceDirectory> 
+          <warSourceDirectory>WebContent</warSourceDirectory>  
+          <webResources> 
+            <resource> 
+              <directory>${project.basedir}</directory>  
+              <targetPath>WEB-INF</targetPath>  
+              <includes> 
+                <include>*.props</include> 
+              </includes> 
+            </resource> 
+          </webResources> 
         </configuration> 
       </plugin>  
       <plugin> 
@@ -160,7 +157,13 @@
                 <includes> 
                   <include>*.war</include> 
                 </includes> 
-              </resource> 
+              </resource>  
+              <!-- <resource>
+                <directory>${project.basedir}</directory>  
+                <includes> 
+                  <include>*.props</include> 
+                </includes> 
+              </resource> --> 
             </resources> 
           </deployment>  
           <resourceGroup>scc-backend-euwest-41631</resourceGroup>  

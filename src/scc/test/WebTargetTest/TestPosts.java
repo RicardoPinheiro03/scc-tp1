@@ -84,7 +84,7 @@ public class TestPosts {
             System.out.println("Must be 1:" + postRes_.getNumberLikes());
 
             Post postRes__ = target.path("/post/" + postRes + "/unlike/cde590ae-6149-41af-8c13-e7577869b83b")
-                    .request()
+                    .request()postIds
                     .accept(MediaType.APPLICATION_JSON)
                     .get(Post.class);
 
@@ -119,9 +119,9 @@ public class TestPosts {
             post1.setRefParent(""); */
 
             Post post1 = new Post();
-            post1.setCommunity("something");
+            post1.setCommunity("s/ducimus");
             post1.setTitle("luisfelipevieira");
-            post1.setTextMessage("este gajo é um palhaço");
+            post1.setTextMessage("estezzz");
             post1.setRefParent("");
 
             String response =  target.path("/post")

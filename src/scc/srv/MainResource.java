@@ -91,14 +91,16 @@ public class MainResource {
                 .build();
     }
 
-    @Path("/initial")
+    @Path("/initial/{cachable}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getMainPosts() {
+    public Response getMainPosts(@PathParam("cachable") boolean cachable) {
         // Cache algorithm:
         // Search in the cache for posts
         // If doesnt find anything: go get the data from the database and put it on cache
         // else return what haves on cache
+
+
 
         AsyncDocumentClient client = CDBConnection.getDocumentClient();
         String PostsCollection = CDBConnection.getCollectionString("Posts");
@@ -113,31 +115,33 @@ public class MainResource {
         //Jedis jedis = getJedisClient();
         JedisPool jp = getJedisClient();
 
-        try(Jedis jedis = jp.getResource()) {
-            List<String> lst = jedis.lrange("MostLikedPosts", 0, 5);
-            // System.out.println("Pos 1 Most Liked Posts: " + lst.get(0));
+        if (cachable) {
+            try(Jedis jedis = jp.getResource()) {
+                List<String> lst = jedis.lrange("MostLikedPosts", 0, 5);
+                // System.out.println("Pos 1 Most Liked Posts: " + lst.get(0));
 
-            if(lst.isEmpty()) {
-                // The query misses the number of likes. TODO
-                Iterator<FeedResponse<Document>> it = client
-                        .queryDocuments(PostsCollection, "SELECT * FROM Posts p WHERE p.refParent = '' AND p.numberLikes > 5", queryOptions)
-                        .toBlocking()
-                        .getIterator();
-                while(it.hasNext()) {
-                    for(Document d : it.next().getResults()) {
-                        Post post = g.fromJson(d.toJson(), Post.class);
-                        postsArray.add(g.toJson(post));
-                        Long cnt = jedis.lpush("MostLikedPosts", d.toJson());
-                        if(cnt > 5)
-                            jedis.ltrim("MostLikedPosts", 0, 5);
-                        else {
-                            jedis.ltrim("MostLikedPosts", 0, cnt); // If it has less than 5 main page posts
+                if(lst.isEmpty()) {
+                    // The query misses the number of likes. TODO
+                    Iterator<FeedResponse<Document>> it = client
+                            .queryDocuments(PostsCollection, "SELECT * FROM Posts p WHERE p.refParent = '' ORDER BY p.numberLikes DESC OFFSET 0 LIMIT 10", queryOptions)
+                            .toBlocking()
+                            .getIterator();
+                    while(it.hasNext()) {
+                        for(Document d : it.next().getResults()) {
+                            Post post = g.fromJson(d.toJson(), Post.class);
+                            postsArray.add(g.toJson(post));
+                            Long cnt = jedis.lpush("MostLikedPosts", d.toJson());
+                            if(cnt > 5)
+                                jedis.ltrim("MostLikedPosts", 0, 5);
+                            else {
+                                jedis.ltrim("MostLikedPosts", 0, cnt); // If it has less than 5 main page posts
+                            }
                         }
                     }
-                }
-            } else {
-                for (String a : lst) {
-                    postsArray.add(a);
+                } else {
+                    for (String a : lst) {
+                        postsArray.add(a);
+                    }
                 }
             }
         }

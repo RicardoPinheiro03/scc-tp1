@@ -33,8 +33,8 @@ public class PostResource {
             Observable<ResourceResponse<Document>> resp = client.createDocument(PostCollection, post, null, false);
 
             // Root post
-            if(!post.getRefParent().equals(""))
-                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build());
+            /* if(!post.getRefParent().equals(""))
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build()); */
 
             FeedOptions queryOptions = new FeedOptions();
             queryOptions.setEnableCrossPartitionQuery(true);
@@ -211,14 +211,15 @@ public class PostResource {
 
         if(!it_.hasNext()) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build());
-        }
+        } // If the iterator does not contain any user, throws exception (Bad Request)
 
         Gson g = new Gson();
         if(it.hasNext()) {
             Document doc0 = it.next().getResults().get(0);
             String doc = doc0.toJson();
             p = g.fromJson(doc, Post.class);
-            p.setNumberLikes();
+            p.setNumberLikes(uid);
+            // p.setNumberLikes();
             resp = client.replaceDocument(doc0.getSelfLink(), p, null);
             //client.replaceDocument(doc_, p, null);
 
@@ -258,7 +259,7 @@ public class PostResource {
         String PostCollection = CDBConnection.getCollectionString("Posts");
         String UserCollection = CDBConnection.getCollectionString("Users");
         Post p;
-        Observable<ResourceResponse<Document>> resp;
+        //Observable<ResourceResponse<Document>> resp;
 
         FeedOptions queryOptions = new FeedOptions();
         queryOptions.setEnableCrossPartitionQuery(true);
@@ -280,7 +281,8 @@ public class PostResource {
         if(it.hasNext()) {
             Document d0 = it.next().getResults().get(0);
             p = g.fromJson(d0.toJson(), Post.class);
-            p.unsetNumberLikes();
+            p.unsetNumberLikes(uid);
+            //p.unsetNumberLikes();
             client.replaceDocument(d0.getSelfLink(), p, null);
         } else {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).build());

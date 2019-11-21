@@ -1,0 +1,46 @@
+==========================================================================
+BEFORE EXECUTING
+==========================================================================
+
+* Install Node Js
+https://nodejs.org/en/
+
+* Install the following packages
+npm install -g artillery --unsafe-perm=true --allow-root
+npm install -g faker
+npm install -g node-fetch --save
+npm install -g --save-dev artillery-plugin-metrics-by-endpoint
+npm install -g https://github.com/preguica/artillery-plugin-metrics-by-endpoint.git
+
+Note: the last package was modified by me for aggregating the result per base
+endpoint - e.g. all media/id endpoints are aggregated under media
+
+==========================================================================
+RUNNING THE BENCHMARKS
+==========================================================================
+Before running the benchamrks, adapt it to your work by modifying
+the URL and adding new scenarios with different initial pages.
+
+* Run the benchmark
+artillery run general-test.yml
+
+* Run the benchmarks, saving results in a file in directory results
+artillery run --output results general-test.yml
+
+* Produce a report from the saved results
+artillery report results/artillery_report_20191119_234619.json
+
+* Run the benchmark with debug on
+DEBUG=http artillery run general-test.yml
+
+Check more info at:
+https://artillery.io/docs/examples/#debugging-http-tests
+
+
+* Running the benchmark using the docker image. 
+In the directory where you have the scripts, run:
+
+docker run -v $(pwd):/config -t nunopreguica/ccs1920-test command
+
+Note: replace $(pwd) by what is appropriate in your system.
+Note: aggregation of URL does not work from the docker image.
