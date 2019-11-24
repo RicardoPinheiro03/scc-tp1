@@ -43,7 +43,7 @@ public class TestMedia {
 
             // ==================================================
             // Try to upload an image and use the endpoint for it
-            File file = new File("../goodPicture.jpg");
+            File file = new File("../slb_logo.png");
 
             FileInputStream fis = null;
             byte[] imageArray = new byte[(int) file.length()];
@@ -56,9 +56,9 @@ public class TestMedia {
                 ioExp.printStackTrace();
             }
 
-            Response res_ = target.path("/media")
+            Response res_ = target.path("/media/")
                     .request()
-                    .accept(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.TEXT_PLAIN)
                     .post(Entity.entity(imageArray, MediaType.APPLICATION_OCTET_STREAM));
 
             System.err.println(res_);

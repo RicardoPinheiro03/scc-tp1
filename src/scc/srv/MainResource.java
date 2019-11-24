@@ -6,11 +6,12 @@ import com.microsoft.azure.cosmosdb.Document;
 import com.microsoft.azure.cosmosdb.FeedOptions;
 import com.microsoft.azure.cosmosdb.FeedResponse;
 import com.microsoft.azure.cosmosdb.rx.AsyncDocumentClient;
-import com.microsoft.azure.management.redis.RedisCache;
+//import com.microsoft.azure.management.redis.RedisCache;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisShardInfo;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 import scc.resources.Post;
 import scc.utils.AzureProperties;
 
@@ -24,8 +25,13 @@ import java.util.Properties;
 
 @Path("/pages")
 public class MainResource {
+    /*Logger logger;
+    private static JedisPool pool;
+    private static Jedis jedis;*/
+    public static final int CACHE_THRESHOLD = 20;
 
-    public JedisPool getJedisClient() {
+
+    /*public JedisPool getJedisClient() {
         Properties props = AzureProperties.getProperties();
         String RedisHostname = props.getProperty("REDIS_URL");
         String cacheKey = props.getProperty("REDIS_KEY");
@@ -47,7 +53,31 @@ public class MainResource {
         //shardInfo.setPassword(cacheKey);
         //Jedis jedis = new Jedis(shardInfo);
         return jedisPool;
+    }*/
+
+    /*public Jedis getJedisConnection() {
+        if(pool == null) {
+            pool = getJedisClient();
+        }
+        return pool.getResource();
     }
+
+    public boolean available() {
+        boolean isConnected = false;
+        jedis = getJedisClient().getResource();
+        try {
+            if (jedis.isConnected()) {
+                isConnected = true;
+            }
+        } catch (JedisConnectionException e) {
+            e.printStackTrace();
+        } finally {
+            if(jedis != null){
+                jedis.close();
+            }
+        }
+        return isConnected;
+    }*/
 
     @Path("/thread/{pid}")
     @GET
@@ -100,48 +130,50 @@ public class MainResource {
         // If doesnt find anything: go get the data from the database and put it on cache
         // else return what haves on cache
 
-
-
-        AsyncDocumentClient client = CDBConnection.getDocumentClient();
-        String PostsCollection = CDBConnection.getCollectionString("Posts");
-        // String emptyString = "''";
-
-        FeedOptions queryOptions = new FeedOptions();
-        queryOptions.setEnableCrossPartitionQuery(true);
-        queryOptions.setMaxDegreeOfParallelism(-1);
-
         JsonArray postsArray = new JsonArray();
         Gson g = new Gson();
-        //Jedis jedis = getJedisClient();
-        JedisPool jp = getJedisClient();
+        //JedisPool jp = getJedisClient();
 
         if (cachable) {
-            try(Jedis jedis = jp.getResource()) {
-                List<String> lst = jedis.lrange("MostLikedPosts", 0, 5);
-                // System.out.println("Pos 1 Most Liked Posts: " + lst.get(0));
-
+            /*if(available()) {
+                jedis = getJedisConnection();
+                List<String> lst = jedis.lrange("MostLikedPosts", 0, CACHE_THRESHOLD);
+                for (String a : lst) {
+                    postsArray.add(a);
+                }
+            } else {*/
+            //String result = "[";
+            try(Jedis jedis = RedisCache.getCache().getJedisPool().getResource()) {
+                List<String> lst = jedis.lrange("MostLikedPosts", 0, CACHE_THRESHOLD);
                 if(lst.isEmpty()) {
-                    // The query misses the number of likes. TODO
-                    Iterator<FeedResponse<Document>> it = client
-                            .queryDocuments(PostsCollection, "SELECT * FROM Posts p WHERE p.refParent = '' ORDER BY p.numberLikes DESC OFFSET 0 LIMIT 10", queryOptions)
-                            .toBlocking()
-                            .getIterator();
-                    while(it.hasNext()) {
-                        for(Document d : it.next().getResults()) {
+                    Iterator<FeedResponse<Document>> it = getAllPosts();
+                    while (it.hasNext()) {
+                        for (Document d : it.next().getResults()) {
                             Post post = g.fromJson(d.toJson(), Post.class);
                             postsArray.add(g.toJson(post));
+                            /*if(result.length() > 1)
+                                result += ",";
+                            result += g.toJson(post);*/
                             Long cnt = jedis.lpush("MostLikedPosts", d.toJson());
-                            if(cnt > 5)
-                                jedis.ltrim("MostLikedPosts", 0, 5);
-                            else {
-                                jedis.ltrim("MostLikedPosts", 0, cnt); // If it has less than 5 main page posts
-                            }
+                            if (cnt > CACHE_THRESHOLD)
+                                jedis.ltrim("MostLikedPosts", 0, cnt);
                         }
                     }
+                    //result += "]";
+                    //jedis.set("MostLikedPosts", result);
                 } else {
                     for (String a : lst) {
                         postsArray.add(a);
                     }
+                }
+            }
+        }
+        else {
+            Iterator<FeedResponse<Document>> it = getAllPosts();
+            while(it.hasNext()) {
+                for (Document d : it.next().getResults()) {
+                    Post post = g.fromJson(d.toJson(), Post.class);
+                    postsArray.add(g.toJson(post));
                 }
             }
         }
@@ -150,5 +182,17 @@ public class MainResource {
                 .status(Response.Status.OK)
                 .entity(g.toJson(postsArray))
                 .build();
+    }
+
+    private Iterator<FeedResponse<Document>> getAllPosts() {
+        AsyncDocumentClient client = CDBConnection.getDocumentClient();
+        String PostsCollection = CDBConnection.getCollectionString("Posts");
+        FeedOptions queryOptions = new FeedOptions();
+        queryOptions.setEnableCrossPartitionQuery(true);
+        queryOptions.setMaxDegreeOfParallelism(-1);
+        return client
+                .queryDocuments(PostsCollection, "SELECT * FROM Posts p WHERE p.refParent = '' ORDER BY p.numberLikes DESC OFFSET 0 LIMIT 20", queryOptions)
+                .toBlocking()
+                .getIterator();
     }
 }

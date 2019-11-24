@@ -1,6 +1,6 @@
 #Create initial set of posts
 config:
-  target: 'https://scc-backend-westeu-nmp.azurewebsites.net'
+  target: 'http://scc-backend-41631.azurewebsites.net'
   plugins:
     metrics-by-endpoint: {}
 #  http:
@@ -25,20 +25,20 @@ scenarios:
     flow:
       - function: "startBrowse"
       - get:                           # get some initial page : last post in this case
-         url: "/post/last/redis"
+         url: "/pages/initial/false" # THIS VERSION IS W/O CACHING. DO ANOTHER SCENARIO FOR THE W/O CACHING. 2 IN 1.
          afterResponse: "selectFromPostList"      # select some posts for later browsing
       - loop:                          # load the images from the post in the list
          - get:
             ifTrue: "hasNextimageid"
             url: "/media/{{ nextimageid }}"
             headers:
-               Accept: image/*
+              Accept: image/*
             afterResponse: "getImageReply"            
         whileTrue: "hasMoreInImageList"
       - loop:                          #Browse main loop                   
          - get:                        # get the thread for the next post (from the previous selected)
             ifTrue: "hasNextid"
-            url: "/post/thread/{{ nextid }}"
+            url: "/pages/thread/{{ nextid }}"
             afterResponse: "selectFromPostThread"   # select posts to browse next and decide whether to reply or like this post
          - loop:                                    # load the image for the main post
             - get:
@@ -50,27 +50,27 @@ scenarios:
            whileTrue: "hasMoreInImageList"
          - post:                                      # execute a like for the post
             ifTrue: "like"
-            url: "/post/like/{{ curid }}/{{ sessionuser }}"
+            url: "/post/{{ curid }}/like/{{ sessionuser }}"
          - function: "genNewPost"
          - post:                                     # submit an image for a reply
             ifTrue: "hasImage and reply"
-            url: "/media"
+            url: "/media/"
             headers:
-               Content-Type: application/octet-stream
-               Accept: text/plain
+              Content-Type: application/octet-stream
+              Accept: text/plain
             beforeRequest: "setNewPostImageBody"
             afterResponse: "genNewImageReply"            
          - post:                                      # submit the post for a reply
             ifTrue: "reply"
-            url: "/post/p"
+            url: "/post/"
             headers:
-               Accept: text/plain
+              Accept: text/plain
             json:
-               community: "{{ curcommunity }}"
-               creator: "{{ sessionuser }}"
-               msg: "{{ msg }}"
-               image: "{{ imageId }}"
-               parentId: "{{ curid }}"
+              community: "{{ community }}"
+              userCreator: "{{ creator }}"
+              textMessage: "{{ msg }}"
+              linkMultimedia: "{{ imageId }}"
+              refParent: "{{ parentId }}"
             afterResponse: "genNewPostReply"
         whileTrue: "endBrowse"                          # continue browsing until deciding to stop
          
@@ -79,28 +79,28 @@ scenarios:
     flow:
       - function: "startBrowse"
       - get:
-          url: "/post/last/redis"
+          url: "/pages/initial/false" # CORRECT THIS TODO
           afterResponse: "selectAllFromPostList"      # select all posts for replying to
       - loop:                                         # for each post
         - function: "genNewPost"
         - post:                                       # upload image
             ifTrue: "hasImage"
-            url: "/media"
+            url: "/media/"
             headers:
               Content-Type: application/octet-stream
               Accept: text/plain
             beforeRequest: "setNewPostImageBody"
             afterResponse: "genNewImageReply"            
         - post:                                       # upload reply
-            url: "/post/p"
+            url: "/post/"
             headers:
               Accept: text/plain
             json:
-              community: "{{ nextcommunity }}"
-              creator: "{{ sessionuser }}"
-              msg: "{{ msg }}"
-              image: "{{ imageId }}"
-              parentId: "{{ nextid }}"
+              community: "{{ community }}"
+              userCreator: "{{ creator }}"
+              textMessage: "{{ msg }}"
+              linkMultimedia: "{{ imageId }}"
+              refParent: "{{ parentId }}"
             afterResponse: "genNewPostReply"
         whileTrue: "hasMoreInBrowseList"
 
@@ -109,7 +109,7 @@ scenarios:
     flow:
       - function: "genNewPost"
       - post:
-          url: "/media"
+          url: "/media/"
           headers:
             Content-Type: application/octet-stream
             Accept: text/plain
@@ -117,13 +117,13 @@ scenarios:
           afterResponse: "genNewImageReply"            
           ifTrue: "hasImage"
       - post:
-          url: "/post/p"
+          url: "/post/"
           headers:
             Accept: text/plain
           json:
             community: "{{ community }}"
-            creator: "{{ creator }}"
-            msg: "{{ msg }}"
-            image: "{{ imageId }}"
-            parentId: ""
+            userCreator: "{{ creator }}"
+            textMessage: "{{ msg }}"
+            linkMultimedia: "{{ imageId }}"
+            refParent: ""
           afterResponse: "genNewPostReply"

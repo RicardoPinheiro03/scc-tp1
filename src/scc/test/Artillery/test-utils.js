@@ -22,9 +22,9 @@ module.exports = {
 }
 
 
-const Faker = require('faker');
-const fs = require('fs');
-const fetch = require('node-fetch');
+const Faker = require('faker')
+const fs = require('fs')
+const fetch = require('node-fetch')
 
 var userNames = [] 
 var userIds = []
@@ -83,8 +83,8 @@ function loadData() {
 	}
 	var i
 	var basefile
-	if( fs.existsSync( './images')) 
-		basefile = './images/cats.'
+	if( fs.existsSync( '/images')) 
+		basefile = '/images/cats.'
 	else
 		basefile =  'images/cats.'	
 	for( i = 1; i <= 40 ; i++) {
@@ -125,7 +125,7 @@ function genNewUserReply(requestParams, response, context, ee, next) {
  */
 function genNewCommunity(context, events, done) {
 	const name = `s/${Faker.lorem.word()}`;
-	context.vars.name = name;	
+	context.vars.name = name;
 	communityNames.push(name);
 	fs.writeFileSync('communitynames.data', JSON.stringify(communityNames));
 	return done()
@@ -190,7 +190,7 @@ function hasMoreInBrowseList(context, next) {
  */
 function checkHasMoreInImageList(context) {
 	context.vars.hasNextimageid = false
-	while( context.vars.hasNextimageid == false && context.vars.postlistimages.length > 0) {
+	while( context.vars.hasNextimageid == false && typeof context.vars.postlistimages !== 'undefeined' && context.vars.postlistimages.length > 0) {
 		context.vars.nextimageid = context.vars.postlistimages.splice(-1,1)[0] // remove element from array
 	    context.vars.hasNextimageid = ! context.vars.readimages.has(context.vars.nextimageid)
 	}
@@ -257,6 +257,7 @@ function startBrowse(context, events, done) {
 	context.vars.idstoread = []
 	context.vars.readimages = new Set()
 	context.vars.browsecount = 0
+	context.vars.postlistimages = []
 	context.vars.sessionuser = userNames.sample()
 	return done()
 }
@@ -425,4 +426,3 @@ function selectAllFromPostList(requestParams, response, context, ee, next) {
 	}
     return next()
 }
-

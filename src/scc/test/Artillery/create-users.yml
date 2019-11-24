@@ -20,5 +20,5 @@ scenarios:
             json:
               name: "{{ name }}"
             afterResponse: "genNewUserReply"
-        count: 10
+        count: 1000
           

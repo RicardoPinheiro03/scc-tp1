@@ -20,6 +20,7 @@ public class MainApplication extends Application {
         set.add( CDBConnection.class );
         set.add( MainResource.class );
         set.add( AzureProperties.class );
+        set.add( RedisCache.class );
         return set;
     }
 }

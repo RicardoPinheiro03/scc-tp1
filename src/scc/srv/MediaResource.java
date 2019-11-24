@@ -14,11 +14,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.Formatter;
 import java.util.Properties;
 
 @Path("/media")
@@ -45,6 +47,14 @@ public class MediaResource {
         return container;
     }
 
+    private static String byteArrayToHex(final byte[] hash) {
+        Formatter formatter = new Formatter();
+        for(byte b : hash) {
+            formatter.format("%02x", b);
+        }
+        return formatter.toString();
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
@@ -52,7 +62,8 @@ public class MediaResource {
         MessageDigest md = MessageDigest.getInstance("MD5");
         //md.update(contents);
         byte[] digest = md.digest(contents); // get the hash of the contents for the UID (Unique Identifier)
-        String nameOfImage = Base64.getEncoder().encodeToString(digest); // Convert the byte array to String
+        String nameOfImage = byteArrayToHex(digest);
+        // String nameOfImage = Base64.getEncoder().encodeToString(digest); // Convert the byte array to String
 
         CloudBlobContainer myContainer = getContainer();
 
